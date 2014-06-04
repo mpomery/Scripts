@@ -50,7 +50,12 @@ def main(argv):
 	print(sectiondata)
 	#input()
 	data = json.loads(sectiondata)
-	print(json.dumps(data, indent=2))
+	#print(json.dumps(data, indent=2))
+	num = data["section"]["presentations"]["totalResults"]
+	print("Number Of Results: " + str(num))
+	for content in data["section"]["presentations"]["pageContents"]:
+		print(content["week"])
+		print(content["richMedia"])
 	
 
 
