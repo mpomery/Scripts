@@ -1,8 +1,10 @@
 import urllib2
+import urllib
 import getopt
 import sys
 import string
 import json
+import os
 
 verstring = "0.1"
 
@@ -47,15 +49,34 @@ def main(argv):
 	except urllib2.URLError, e:
 		print(e)
 		exit(0)
-	print(sectiondata)
+	#print(sectiondata)
 	#input()
 	data = json.loads(sectiondata)
 	#print(json.dumps(data, indent=2))
 	num = data["section"]["presentations"]["totalResults"]
+	vidnumber = num
+	course = data["section"]["course"]["identifier"]
+	print("Unit: " + course)
+	if not os.path.isdir(course):
+		os.mkdir(course)
 	print("Number Of Results: " + str(num))
+	videos = []
 	for content in data["section"]["presentations"]["pageContents"]:
-		print(content["week"])
-		print(content["richMedia"])
+		videos.append([vidnumber, str(content["richMedia"] + "/mediacontent.m4v"), str(content["startTime"][0:10])])
+		#print(vidnumber)
+		#print(content["week"])
+		#print(content["richMedia"] + "/mediacontent.m4v")
+		#print(content["startTime"])
+		#print(content["startTime"][0:10])
+		vidnumber -= 1
+	videos.reverse()
+	for video in videos:
+		#print(video)
+		if not os.path.exists(course + "/" + str(video[0]) + " " + video[2] + ".m4v"):
+			urllib.urlretrieve(video[1], course + "/" + str(video[0]) + " " + video[2] + ".m4v")
+			print(course + "/" + str(video[0]) + " " + video[2] + ".m4v - Download Complete")
+		else:
+			print(course + "/" + str(video[0]) + " " + video[2] + ".m4v - Already Exists")
 	
 
 
