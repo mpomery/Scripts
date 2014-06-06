@@ -19,19 +19,21 @@ def main(argv):
 		version()
 	url = argv[0]
 	#print(url)
-	start, params = string.split(url, ";", 1)
-	opts = string.split(params, "?")
+	jsessionId = "was9hsuug3c4mc2l7scvhhgk"
+	if ";" in url:
+		start, jsessionId, params = string.split(string.replace(url, "?", ";"), ";", 2)
+		jsessionId = string.split(opt, "=", 1)[1]
+	else:
+		start, params = string.split(url, "?", 1)
+	opts = string.split(params, "&", 1)
 	#print(start)
 	#print(params)
 	#print(opts)
-	jsessionId = None
 	sectionId = None
 	for opt in opts:
 		name, val = string.split(opt, "=", 1)
 		if name == "sectionId":
 			sectionId = val
-		elif name == "jsessionid":
-			jsessionId = val
 	#print(sectionId)
 	
 	api = string.rsplit(start, "/", 2)[0] + "/api/" + sectionId + "/section-data.json?skipCache=false&pageIndex=1&pageSize=50"
@@ -42,7 +44,8 @@ def main(argv):
 		f = urllib2.urlopen(url)
 		#print("URL Opened")
 		opener = urllib2.build_opener()
-		opener.addheaders.append(('Cookie', 'jsessionid=' + jsessionId))
+		if jsessionId is not None:
+			opener.addheaders.append(('Cookie', 'jsessionid=' + jsessionId))
 		f = opener.open(api)
 		#print("API Call Made")
 		sectiondata = f.read()
