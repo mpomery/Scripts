@@ -18,30 +18,25 @@ def main(argv):
 	if len(argv) != 1:
 		version()
 	url = argv[0]
-	#print(url)
+	print(url)
 	jsessionId = "was9hsuug3c4mc2l7scvhhgk"
-	if ";" in url:
-		start, jsessionId, params = string.split(string.replace(url, "?", ";"), ";", 2)
-		jsessionId = string.split(opt, "=", 1)[1]
-	else:
-		start, params = string.split(url, "?", 1)
-	opts = string.split(params, "&", 1)
-	#print(start)
-	#print(params)
-	#print(opts)
-	sectionId = None
-	for opt in opts:
-		name, val = string.split(opt, "=", 1)
-		if name == "sectionId":
-			sectionId = val
-	#print(sectionId)
+	start, end = string.split(url, "?")
+	start = string.rsplit(start, "/", 3)[0]
+	print(start)
 	
-	api = string.rsplit(start, "/", 2)[0] + "/api/" + sectionId + "/section-data.json?skipCache=false&pageIndex=1&pageSize=50"
-	#print(api)
+	try:
+		f = urllib2.urlopen(url)
+		for line in f:
+			if "<iframe " in line:
+				sectionId = string.split(string.split(line, "section/", 1)[1], "?", 1)[0]
+	except urllib2.URLError, e:
+		print(e)
+		exit(0)
+	
+	api = start + "/client/api/sections/" + sectionId + "/section-data.json?skipCache=false&pageIndex=1&pageSize=50"
+	print(api)
 	sectiondata = ""
 	try:
-		# Open the URL to look legit
-		f = urllib2.urlopen(url)
 		#print("URL Opened")
 		opener = urllib2.build_opener()
 		if jsessionId is not None:
@@ -52,8 +47,12 @@ def main(argv):
 	except urllib2.URLError, e:
 		print(e)
 		exit(0)
-	#print(sectiondata)
+	print(sectiondata)
 	#input()
+	
+	
+	return None
+	
 	data = json.loads(sectiondata)
 	#print(json.dumps(data, indent=2))
 	num = data["section"]["presentations"]["totalResults"]
